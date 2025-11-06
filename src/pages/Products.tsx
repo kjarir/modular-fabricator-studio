@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { AddProductDrawer } from "@/components/AddProductDrawer";
 import { initialProducts } from "@/data/products";
@@ -11,6 +11,7 @@ export default function Products() {
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [selectedCategory, setSelectedCategory] = useState("All Products");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const handleAddProduct = (newProduct: Omit<Product, "id">) => {
     const product: Product = {
@@ -18,7 +19,21 @@ export default function Products() {
       id: Date.now().toString(),
     };
     setProducts([product, ...products]);
+    setIsDrawerOpen(false);
   };
+
+  // Hidden keyboard shortcut: Ctrl+Shift+A to open add product drawer
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+        e.preventDefault();
+        setIsDrawerOpen(true);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -44,8 +59,14 @@ export default function Products() {
                 Browse our complete range of instrument fittings
               </p>
             </div>
-            <AddProductDrawer onAddProduct={handleAddProduct} />
           </div>
+          
+          {/* Hidden Add Product Drawer - accessible via Ctrl+Shift+A */}
+          <AddProductDrawer 
+            open={isDrawerOpen} 
+            onOpenChange={setIsDrawerOpen}
+            onAddProduct={handleAddProduct} 
+          />
 
           {/* Search Bar */}
           <div className="relative max-w-md">

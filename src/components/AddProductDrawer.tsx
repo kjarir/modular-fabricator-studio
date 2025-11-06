@@ -24,10 +24,18 @@ import { toast } from "sonner";
 
 interface AddProductDrawerProps {
   onAddProduct: (product: Omit<Product, "id">) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export const AddProductDrawer = ({ onAddProduct }: AddProductDrawerProps) => {
-  const [open, setOpen] = useState(false);
+export const AddProductDrawer = ({ 
+  onAddProduct, 
+  open: controlledOpen,
+  onOpenChange 
+}: AddProductDrawerProps) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = onOpenChange || setInternalOpen;
   const [formData, setFormData] = useState({
     name: "",
     category: "",

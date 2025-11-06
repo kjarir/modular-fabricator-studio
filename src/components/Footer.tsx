@@ -3,16 +3,16 @@ import { Mail, Phone, MapPin } from "lucide-react";
 
 export const Footer = () => {
   return (
-    <footer className="border-t border-border bg-muted">
+    <footer className="border-t border-border bg-muted/30 backdrop-blur mt-20">
       <div className="container mx-auto px-4 py-12">
         <div className="grid gap-8 md:grid-cols-4">
           {/* Company Info */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-hero">
-                <span className="text-xl font-bold text-primary-foreground">PI</span>
+                <span className="text-xl font-bold text-primary-foreground">NY</span>
               </div>
-              <span className="text-lg font-bold text-foreground">Precision Instruments</span>
+              <span className="text-lg font-bold text-foreground">NoNameYet</span>
             </div>
             <p className="text-sm text-muted-foreground">
               Leading manufacturer of precision instrument fittings and tube systems for industrial applications.
@@ -78,7 +78,7 @@ export const Footer = () => {
         </div>
 
         <div className="mt-12 border-t border-border pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Precision Instruments. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} NoNameYet. All rights reserved.</p>
         </div>
       </div>
     </footer>

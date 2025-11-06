@@ -16,7 +16,7 @@ export default function Home() {
           <img
             src={heroImage}
             alt="Industrial precision manufacturing"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover scale-105 animate-[scale-in_1.5s_ease-out]"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/85 to-background/70" />
         </div>

@@ -101,7 +101,7 @@ export default function Products() {
             {filteredProducts.map((product, index) => (
               <div
                 key={product.id}
-                className="animate-fade-in"
+                className="animate-scale-in"
                 style={{ animationDelay: `${(index % 12) * 0.05}s` }}
               >
                 <ProductCard product={product} />

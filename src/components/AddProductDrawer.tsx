@@ -1,9 +1,15 @@
 import { useState } from "react";
-import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   Select,
   SelectContent,
@@ -11,37 +17,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Product, productCategories } from "@/types/product";
+import { Product } from "@/types/product";
 import { toast } from "sonner";
+import { Plus } from "lucide-react";
 
 interface AddProductDrawerProps {
   onAddProduct: (product: Omit<Product, "id">) => void;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  existingCategories: string[];
 }
 
 export const AddProductDrawer = ({ 
   onAddProduct, 
-  open: controlledOpen,
-  onOpenChange 
+  open, 
+  onOpenChange,
+  existingCategories 
 }: AddProductDrawerProps) => {
-  const [internalOpen, setInternalOpen] = useState(false);
-  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
-  const setOpen = onOpenChange || setInternalOpen;
   const [formData, setFormData] = useState({
     name: "",
     category: "",
     description: "",
     specifications: "",
   });
+  const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,9 +51,16 @@ export const AddProductDrawer = ({
       return;
     }
 
-    const newProduct: Omit<Product, "id"> = {
+    const categoryToUse = isAddingNewCategory ? newCategory : formData.category;
+
+    if (!categoryToUse) {
+      toast.error("Please select or add a category");
+      return;
+    }
+
+    const newProduct = {
       name: formData.name,
-      category: formData.category,
+      category: categoryToUse,
       description: formData.description,
       specifications: formData.specifications
         ? formData.specifications.split("\n").filter(spec => spec.trim())
@@ -70,25 +77,23 @@ export const AddProductDrawer = ({
       description: "",
       specifications: "",
     });
-    setOpen(false);
+    setIsAddingNewCategory(false);
+    setNewCategory("");
   };
 
+  // Filter out "All Products" from category dropdown
+  const availableCategories = existingCategories.filter(cat => cat !== "All Products");
+
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button size="lg" className="gap-2 shadow-lg">
-          <Plus className="h-5 w-5" />
-          Add New Product
-        </Button>
-      </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md overflow-y-auto">
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Add New Product</SheetTitle>
           <SheetDescription>
-            Fill in the details to add a new product to the catalog.
+            Add a new product to your catalog. Press Ctrl+Shift+A to open this drawer.
           </SheetDescription>
         </SheetHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-6 mt-6">
           <div className="space-y-2">
             <Label htmlFor="name">Product Name *</Label>
@@ -96,29 +101,75 @@ export const AddProductDrawer = ({
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="e.g., Front Ferrule"
+              placeholder="e.g., Ball Valve"
               required
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="category">Category *</Label>
-            <Select
-              value={formData.category}
-              onValueChange={(value) => setFormData({ ...formData, category: value })}
-              required
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {productCategories.slice(1).map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {!isAddingNewCategory ? (
+              <div className="flex gap-2">
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                >
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableCategories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setIsAddingNewCategory(true)}
+                  title="Add new category"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Input
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  placeholder="Enter new category name"
+                  required
+                />
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setIsAddingNewCategory(false);
+                      setNewCategory("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => {
+                      if (newCategory.trim()) {
+                        setFormData({ ...formData, category: newCategory });
+                        setIsAddingNewCategory(false);
+                      }
+                    }}
+                  >
+                    Use Category
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -127,7 +178,7 @@ export const AddProductDrawer = ({
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Describe the product and its key features..."
+              placeholder="Describe the product features and benefits"
               rows={4}
               required
             />
@@ -139,10 +190,10 @@ export const AddProductDrawer = ({
               id="specifications"
               value={formData.specifications}
               onChange={(e) => setFormData({ ...formData, specifications: e.target.value })}
-              placeholder="Enter each specification on a new line&#10;Material: Stainless Steel 316&#10;Pressure: Up to 10,000 PSI"
-              rows={5}
+              placeholder="Enter specifications (one per line)&#10;e.g., Material: SS316&#10;Pressure Rating: Up to 6000 PSI"
+              rows={6}
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Enter each specification on a new line
             </p>
           </div>
@@ -154,9 +205,9 @@ export const AddProductDrawer = ({
             <Button
               type="button"
               variant="outline"
-              onClick={() => setOpen(false)}
+              onClick={() => onOpenChange(false)}
             >
-              <X className="h-4 w-4" />
+              Cancel
             </Button>
           </div>
         </form>

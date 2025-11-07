@@ -24,12 +24,14 @@ export default function Home() {
         <div className="container relative mx-auto px-4 py-24">
           <div className="max-w-2xl space-y-6 animate-fade-in">
             <h1 className="text-5xl md:text-6xl font-bold leading-tight text-foreground">
-              Precision Engineered
-              <span className="block text-primary mt-2">Instrument Fittings</span>
+              Precision in
+              <span className="block text-primary mt-2">Every Flow</span>
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed">
-              Industry-leading manufacturer of high-quality compression tube fittings
-              and instrumentation solutions for demanding applications.
+              Welcome to Flowra Valves, a trusted name in high-quality fittings and valves 
+              for industrial, commercial, and engineering applications. With a commitment 
+              to precision, durability, and performance, we provide a comprehensive range 
+              of products designed to meet the demanding needs of modern industries.
             </p>
             <div className="flex flex-wrap gap-4 pt-4">
               <Button size="lg" asChild>
@@ -54,10 +56,10 @@ export default function Home() {
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
                 <Shield className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold">Leak-Proof Quality</h3>
+               <h3 className="text-xl font-semibold">Superior Quality</h3>
               <p className="text-muted-foreground">
-                Double ferrule compression design ensures zero-leak performance
-                up to 10,000 PSI.
+                Premium materials and international standards ensure leak-free 
+                connections and consistent performance up to 20,000 PSI.
               </p>
             </div>
             
@@ -65,10 +67,10 @@ export default function Home() {
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent/10">
                 <Zap className="h-8 w-8 text-accent" />
               </div>
-              <h3 className="text-xl font-semibold">Rapid Installation</h3>
+               <h3 className="text-xl font-semibold">Innovation & Craftsmanship</h3>
               <p className="text-muted-foreground">
-                Torque-free design allows quick, reliable installation without
-                specialized tools.
+                Combining engineering excellence with quality manufacturing to deliver 
+                reliable flow management solutions.
               </p>
             </div>
             
@@ -76,10 +78,10 @@ export default function Home() {
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
                 <CheckCircle2 className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold">Industry Standard</h3>
+               <h3 className="text-xl font-semibold">Customer-Focused Service</h3>
               <p className="text-muted-foreground">
-                Fully compliant with international standards and specifications
-                for critical applications.
+                Customized solutions, prompt delivery, and unmatched technical 
+                support for all your instrumentation needs.
               </p>
             </div>
           </div>
@@ -92,8 +94,8 @@ export default function Home() {
           <div className="mb-12 text-center space-y-4">
             <h2 className="text-4xl font-bold text-foreground">Featured Products</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Explore our range of precision-engineered instrument fittings
-              designed for reliability and performance.
+              From stainless steel fittings to advanced control valves, our solutions 
+              ensure reliable flow management and optimal system efficiency.
             </p>
           </div>
           

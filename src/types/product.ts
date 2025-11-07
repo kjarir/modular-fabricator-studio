@@ -7,12 +7,16 @@ export interface Product {
   specifications?: string[];
 }
 
-export const productCategories = [
+// Product categories are now dynamic and stored in state
+// Initial categories for seeding
+export const initialProductCategories = [
   "All Products",
-  "Ferrules & Caps",
-  "Unions & Connectors",
-  "Elbows & Tees",
-  "Adapters & Closures",
+  "Ball Valves",
+  "Needle Valves",
+  "Check Valves",
+  "Pipe Fittings",
+  "Double Ferrule Fittings",
+  "JIC Fittings",
+  "Autoclave Fittings",
+  "Manifold Valves",
 ] as const;
-
-export type ProductCategory = typeof productCategories[number];

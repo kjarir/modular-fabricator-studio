@@ -10,12 +10,12 @@ export const Footer = () => {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-hero">
-                <span className="text-xl font-bold text-primary-foreground">NY</span>
+                <span className="text-xl font-bold text-primary-foreground">FV</span>
               </div>
-              <span className="text-lg font-bold text-foreground">NoNameYet</span>
+              <span className="text-lg font-bold text-foreground">Flowra Valves</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Leading manufacturer of precision instrument fittings and tube systems for industrial applications.
+              A trusted name in high-quality fittings and valves for industrial, commercial, and engineering applications.
             </p>
           </div>
 
@@ -50,10 +50,11 @@ export const Footer = () => {
           <div>
             <h3 className="mb-4 text-sm font-semibold text-foreground">Product Categories</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>Ferrules & Caps</li>
-              <li>Unions & Connectors</li>
-              <li>Elbows & Tees</li>
-              <li>Adapters & Closures</li>
+              <li>Ball Valves</li>
+              <li>Needle Valves</li>
+              <li>Check Valves</li>
+              <li>Manifold Valves</li>
+              <li>Pipe Fittings</li>
             </ul>
           </div>
 
@@ -63,22 +64,22 @@ export const Footer = () => {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2">
                 <Mail className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-muted-foreground">info@precisioninstruments.com</span>
+                <span className="text-muted-foreground">flowravalves@gmail.com</span>
               </li>
               <li className="flex items-start gap-2">
                 <Phone className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-muted-foreground">+1 (555) 123-4567</span>
+                <span className="text-muted-foreground">+91 9372300603</span>
               </li>
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-muted-foreground">123 Industrial Ave, Manufacturing City, MC 12345</span>
+                <span className="text-muted-foreground">Contact: Arif Shaikh</span>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="mt-12 border-t border-border pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} NoNameYet. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Flowra Valves. All rights reserved.</p>
         </div>
       </div>
     </footer>

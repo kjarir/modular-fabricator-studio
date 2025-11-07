@@ -2,13 +2,14 @@ import { useState, useMemo, useEffect } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { AddProductDrawer } from "@/components/AddProductDrawer";
 import { initialProducts } from "@/data/products";
-import { Product, productCategories } from "@/types/product";
+import { Product, initialProductCategories } from "@/types/product";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
 export default function Products() {
   const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [categories, setCategories] = useState<string[]>([...initialProductCategories]);
   const [selectedCategory, setSelectedCategory] = useState("All Products");
   const [searchQuery, setSearchQuery] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -19,6 +20,12 @@ export default function Products() {
       id: Date.now().toString(),
     };
     setProducts([product, ...products]);
+    
+    // Add new category if it doesn't exist
+    if (!categories.includes(newProduct.category)) {
+      setCategories([...categories, newProduct.category]);
+    }
+    
     setIsDrawerOpen(false);
   };
 
@@ -65,7 +72,8 @@ export default function Products() {
           <AddProductDrawer 
             open={isDrawerOpen} 
             onOpenChange={setIsDrawerOpen}
-            onAddProduct={handleAddProduct} 
+            onAddProduct={handleAddProduct}
+            existingCategories={categories}
           />
 
           {/* Search Bar */}
@@ -82,7 +90,7 @@ export default function Products() {
 
           {/* Category Filter */}
           <div className="flex flex-wrap gap-2">
-            {productCategories.map((category) => (
+            {categories.map((category) => (
               <Button
                 key={category}
                 variant={selectedCategory === category ? "default" : "outline"}

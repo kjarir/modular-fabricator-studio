@@ -31,7 +31,8 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product }: ProductCardProps) => {
-  const productImage = productImages[product.id];
+  // Use cloud image URL if available, otherwise fallback to mapped images
+  const productImage = product.image || productImages[product.id];
 
   return (
     <Link to={`/products/${product.id}`} className="block group">

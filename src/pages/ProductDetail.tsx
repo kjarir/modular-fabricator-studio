@@ -1,5 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { initialProducts } from "@/data/products";
+import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -8,6 +10,8 @@ import frontFerrule from "@/assets/products/front-ferrule.jpg";
 import union from "@/assets/products/union.jpg";
 import elbow from "@/assets/products/elbow.jpg";
 import connector from "@/assets/products/connector.jpg";
+
+const STORAGE_KEY = "flowra_products";
 
 const productImages: Record<string, string> = {
   "1": frontFerrule,
@@ -30,7 +34,14 @@ const productImages: Record<string, string> = {
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const product = initialProducts.find((p) => p.id === id);
+  
+  // Load products from localStorage or use initial data
+  const [products, setProducts] = useState<Product[]>(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : initialProducts;
+  });
+  
+  const product = products.find((p) => p.id === id);
 
   if (!product) {
     return (
@@ -47,7 +58,8 @@ export default function ProductDetail() {
     );
   }
 
-  const productImage = productImages[product.id];
+  // Use cloud image URL if available, otherwise fallback to mapped images
+  const productImage = product.image || productImages[product.id];
 
   return (
     <div className="min-h-screen py-12">
@@ -152,7 +164,7 @@ export default function ProductDetail() {
         <div className="animate-fade-in" style={{ animationDelay: "0.5s" }}>
           <h2 className="text-3xl font-bold mb-8">Related Products</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {initialProducts
+            {products
               .filter(
                 (p) => p.category === product.category && p.id !== product.id
               )
@@ -166,9 +178,9 @@ export default function ProductDetail() {
                 >
                   <Card className="p-4 h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                     <div className="aspect-square bg-muted rounded-lg mb-4 overflow-hidden">
-                      {productImages[relatedProduct.id] ? (
+                      {(relatedProduct.image || productImages[relatedProduct.id]) ? (
                         <img
-                          src={productImages[relatedProduct.id]}
+                          src={relatedProduct.image || productImages[relatedProduct.id]}
                           alt={relatedProduct.name}
                           className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-300"
                         />

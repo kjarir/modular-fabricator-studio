@@ -24,8 +24,20 @@ export default function Contact() {
       return;
     }
 
-    // Here you would typically send the form data to your backend
-    toast.success("Message sent successfully! We'll get back to you soon.");
+    // Construct email content
+    const subject = encodeURIComponent(`Contact Form: ${formData.name} - ${formData.company || 'No Company'}`);
+    const body = encodeURIComponent(
+      `Name: ${formData.name}\n` +
+      `Email: ${formData.email}\n` +
+      `Phone: ${formData.phone || 'Not provided'}\n` +
+      `Company: ${formData.company || 'Not provided'}\n\n` +
+      `Message:\n${formData.message}`
+    );
+    
+    // Open email client
+    window.location.href = `mailto:arifshaikh@gmail.com?subject=${subject}&body=${body}`;
+    
+    toast.success("Opening your email client...");
     
     // Reset form
     setFormData({
@@ -67,7 +79,7 @@ export default function Contact() {
                   <div>
                     <p className="font-medium text-foreground">Email</p>
                     <p className="text-sm text-muted-foreground">
-                      info@precisioninstruments.com
+                      arifshaikh@gmail.com
                     </p>
                   </div>
                 </div>

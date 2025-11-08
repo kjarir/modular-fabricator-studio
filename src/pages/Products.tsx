@@ -1,40 +1,47 @@
 import { useState, useMemo, useEffect } from "react";
 import { ProductCard } from "@/components/ProductCard";
-import { AddProductDrawer } from "@/components/AddProductDrawer";
+import { AdminPanel } from "@/components/AdminPanel";
 import { initialProducts } from "@/data/products";
 import { Product, initialProductCategories } from "@/types/product";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
+const STORAGE_KEY = "flowra_products";
+const CATEGORIES_KEY = "flowra_categories";
+
 export default function Products() {
-  const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [categories, setCategories] = useState<string[]>([...initialProductCategories]);
+  // Load from localStorage or use initial data
+  const [products, setProducts] = useState<Product[]>(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : initialProducts;
+  });
+  
+  const [categories, setCategories] = useState<string[]>(() => {
+    const stored = localStorage.getItem(CATEGORIES_KEY);
+    return stored ? JSON.parse(stored) : [...initialProductCategories];
+  });
+  
   const [selectedCategory, setSelectedCategory] = useState("All Products");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
 
-  const handleAddProduct = (newProduct: Omit<Product, "id">) => {
-    const product: Product = {
-      ...newProduct,
-      id: Date.now().toString(),
-    };
-    setProducts([product, ...products]);
-    
-    // Add new category if it doesn't exist
-    if (!categories.includes(newProduct.category)) {
-      setCategories([...categories, newProduct.category]);
-    }
-    
-    setIsDrawerOpen(false);
-  };
+  // Save to localStorage whenever products change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+  }, [products]);
 
-  // Hidden keyboard shortcut: Ctrl+Shift+A to open add product drawer
+  // Save to localStorage whenever categories change
+  useEffect(() => {
+    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+  }, [categories]);
+
+  // Hidden keyboard shortcut: Ctrl+Shift+A to open admin panel
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.shiftKey && e.key === 'A') {
         e.preventDefault();
-        setIsDrawerOpen(true);
+        setIsAdminOpen(true);
       }
     };
     
@@ -68,12 +75,14 @@ export default function Products() {
             </div>
           </div>
           
-          {/* Hidden Add Product Drawer - accessible via Ctrl+Shift+A */}
-          <AddProductDrawer 
-            open={isDrawerOpen} 
-            onOpenChange={setIsDrawerOpen}
-            onAddProduct={handleAddProduct}
-            existingCategories={categories}
+          {/* Hidden Admin Panel - accessible via Ctrl+Shift+A */}
+          <AdminPanel 
+            open={isAdminOpen} 
+            onOpenChange={setIsAdminOpen}
+            products={products}
+            categories={categories}
+            onProductsChange={setProducts}
+            onCategoriesChange={setCategories}
           />
 
           {/* Search Bar */}

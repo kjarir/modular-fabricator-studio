@@ -4,8 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Phone, MapPin, Clock } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import emailjs from "@emailjs/browser";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -15,8 +16,9 @@ export default function Contact() {
     company: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.message) {
@@ -24,29 +26,121 @@ export default function Contact() {
       return;
     }
 
-    // Construct email content
-    const subject = encodeURIComponent(`Contact Form: ${formData.name} - ${formData.company || 'No Company'}`);
-    const body = encodeURIComponent(
-      `Name: ${formData.name}\n` +
-      `Email: ${formData.email}\n` +
-      `Phone: ${formData.phone || 'Not provided'}\n` +
-      `Company: ${formData.company || 'Not provided'}\n\n` +
-      `Message:\n${formData.message}`
-    );
+    setIsSubmitting(true);
+
+    try {
+      // Try backend API first (recommended)
+      const apiEndpoint = import.meta.env.VITE_API_ENDPOINT || "http://localhost:3001/api/send-email";
+      
+      try {
+        const response = await fetch(apiEndpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            to: "arifshaikh@gmail.com",
+            from: formData.email,
+            name: formData.name,
+            phone: formData.phone || "Not provided",
+            company: formData.company || "Not provided",
+            message: formData.message,
+            subject: `Contact Form: ${formData.name} - ${formData.company || 'No Company'}`,
+          }),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            toast.success("Message sent successfully! We'll get back to you soon.");
+            // Reset form
+            setFormData({
+              name: "",
+              email: "",
+              phone: "",
+              company: "",
+              message: "",
+            });
+            return;
+          }
+        }
+      } catch (apiError) {
+        console.log("Backend API not available, trying EmailJS...", apiError);
+      }
+
+      // Try EmailJS if backend is not available
+      const emailjsPublicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+      const emailjsServiceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+      const emailjsTemplateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+
+      if (emailjsPublicKey && emailjsServiceId && emailjsTemplateId) {
+        const templateParams = {
+          to_email: "arifshaikh@gmail.com",
+          from_name: formData.name,
+          from_email: formData.email,
+          phone: formData.phone || "Not provided",
+          company: formData.company || "Not provided",
+          message: formData.message,
+          subject: `Contact Form: ${formData.name} - ${formData.company || 'No Company'}`,
+        };
+
+        await emailjs.send(emailjsServiceId, emailjsTemplateId, templateParams, emailjsPublicKey);
+        toast.success("Message sent successfully! We'll get back to you soon.");
+      } else {
+        // Fallback to Web3Forms
+        await sendViaWeb3Forms();
+      }
+
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        company: "",
+        message: "",
+      });
+    } catch (error: any) {
+      console.error("Error sending email:", error);
+      toast.error(
+        error.message || "Failed to send message. Please try again or contact us directly at arifshaikh@gmail.com"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Send email via Web3Forms (free service)
+  const sendViaWeb3Forms = async () => {
+    const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
     
-    // Open email client
-    window.location.href = `mailto:arifshaikh@gmail.com?subject=${subject}&body=${body}`;
+    if (!accessKey || accessKey === "YOUR_ACCESS_KEY_HERE") {
+      throw new Error("Email service not configured. Please set up EmailJS, Web3Forms, or a backend API.");
+    }
     
-    toast.success("Opening your email client...");
-    
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      company: "",
-      message: "",
+    const response = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        access_key: accessKey,
+        subject: `Contact Form: ${formData.name} - ${formData.company || 'No Company'}`,
+        from_name: formData.name,
+        from_email: formData.email,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || "Not provided",
+        company: formData.company || "Not provided",
+        message: formData.message,
+      }),
     });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || "Failed to send email");
+    }
   };
 
   return (
@@ -90,7 +184,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="font-medium text-foreground">Phone</p>
-                    <p className="text-sm text-muted-foreground">+1 (555) 123-4567</p>
+                    <p className="text-sm text-muted-foreground">+91 9372300603</p>
                   </div>
                 </div>
 
@@ -202,8 +296,20 @@ export default function Contact() {
                     />
                   </div>
 
-                  <Button type="submit" size="lg" className="w-full sm:w-auto">
-                    Send Message
+                  <Button 
+                    type="submit" 
+                    size="lg" 
+                    className="w-full sm:w-auto"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      "Send Message"
+                    )}
                   </Button>
                 </form>
               </CardContent>

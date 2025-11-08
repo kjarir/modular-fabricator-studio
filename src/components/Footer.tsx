@@ -64,7 +64,7 @@ export const Footer = () => {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2">
                 <Mail className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-muted-foreground">flowravalves@gmail.com</span>
+                <span className="text-muted-foreground">arifshaikh@gmail.com</span>
               </li>
               <li className="flex items-start gap-2">
                 <Phone className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
@@ -79,7 +79,7 @@ export const Footer = () => {
         </div>
 
         <div className="mt-12 border-t border-border pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Flowra Valves. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Flowra Valves. All rights reserved | Designed & Developed by <a href="https://www.linkedin.com/in/mohdjarirnoorkhan/" className="text-primary hover:text-primary-hover transition-colors">Mohd Jarir</a></p>
         </div>
       </div>
     </footer>

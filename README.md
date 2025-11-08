@@ -1,26 +1,16 @@
-# Welcome to your Lovable project
+# Flowra Valves - Premium Fittings & Valves
 
-## Project info
+A modern web application for Flowra Valves, showcasing high-quality industrial valves and fittings.
 
-**URL**: https://lovable.dev/projects/28ac00e8-d11f-48bf-afd9-42dbb2879635
+## Project Overview
 
-## How can I edit this code?
+Flowra Valves is a trusted manufacturer of high-quality fittings and valves for industrial, commercial, and engineering applications. This website showcases our product range and allows customers to contact us directly.
 
-There are several ways of editing your application.
+## Getting Started
 
-**Use Lovable**
+### Installation
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/28ac00e8-d11f-48bf-afd9-42dbb2879635) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Follow these steps to run the project locally:
 
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
@@ -62,12 +52,35 @@ This project is built with:
 
 ## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/28ac00e8-d11f-48bf-afd9-42dbb2879635) and click on Share -> Publish.
+### Deploy to Vercel (Recommended)
 
-## Can I connect a custom domain to my Lovable project?
+1. Push your code to GitHub
+2. Import the repository in Vercel
+3. Vercel will automatically deploy your application
 
-Yes, you can!
+### Deploy to other platforms
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+This project can be deployed to any platform that supports Node.js:
+- Netlify
+- Railway
+- Render
+- AWS Amplify
+- Any other static hosting service
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Environment Variables
+
+For production deployment, make sure to set up:
+- `VITE_API_ENDPOINT` - Backend API endpoint for contact form
+- Or configure EmailJS/Web3Forms as described in `EMAIL_SETUP.md`
+
+## Features
+
+- 🏠 Homepage with hero section
+- 📦 Product catalog with detailed product pages
+- 📧 Contact form with direct email sending
+- 📱 Fully responsive design
+- ⚡ Fast and optimized performance
+
+## Contact
+
+For inquiries, please visit the Contact page or email: arifshaikh@gmail.com

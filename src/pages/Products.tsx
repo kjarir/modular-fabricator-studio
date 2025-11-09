@@ -1,53 +1,20 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { AdminPanel } from "@/components/AdminPanel";
-import { initialProducts } from "@/data/products";
-import { Product, initialProductCategories } from "@/types/product";
+import { useProducts } from "@/hooks/useProducts";
+import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
-
-const STORAGE_KEY = "flowra_products";
-const CATEGORIES_KEY = "flowra_categories";
+import { Search, Settings } from "lucide-react";
 
 export default function Products() {
-  // Load from localStorage or use initial data
-  const [products, setProducts] = useState<Product[]>(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : initialProducts;
-  });
-  
-  const [categories, setCategories] = useState<string[]>(() => {
-    const stored = localStorage.getItem(CATEGORIES_KEY);
-    return stored ? JSON.parse(stored) : [...initialProductCategories];
-  });
-  
+  const { products, categories, isLoading } = useProducts();
+  const { isAdmin } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState("All Products");
   const [searchQuery, setSearchQuery] = useState("");
   const [isAdminOpen, setIsAdminOpen] = useState(false);
 
-  // Save to localStorage whenever products change
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-  }, [products]);
-
-  // Save to localStorage whenever categories change
-  useEffect(() => {
-    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
-  }, [categories]);
-
-  // Hidden keyboard shortcut: Ctrl+Shift+A to open admin panel
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-        e.preventDefault();
-        setIsAdminOpen(true);
-      }
-    };
-    
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
+  const allCategories = ["All Products", ...categories];
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -61,6 +28,17 @@ export default function Products() {
     });
   }, [products, selectedCategory, searchQuery]);
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading products...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen py-12">
       <div className="container mx-auto px-4">
@@ -73,17 +51,21 @@ export default function Products() {
                 Browse our complete range of instrument fittings
               </p>
             </div>
+            {isAdmin && (
+              <Button onClick={() => setIsAdminOpen(true)}>
+                <Settings className="h-4 w-4 mr-2" />
+                Admin Panel
+              </Button>
+            )}
           </div>
           
-          {/* Hidden Admin Panel - accessible via Ctrl+Shift+A */}
-          <AdminPanel 
-            open={isAdminOpen} 
-            onOpenChange={setIsAdminOpen}
-            products={products}
-            categories={categories}
-            onProductsChange={setProducts}
-            onCategoriesChange={setCategories}
-          />
+          {/* Admin Panel */}
+          {isAdmin && (
+            <AdminPanel 
+              open={isAdminOpen} 
+              onOpenChange={setIsAdminOpen}
+            />
+          )}
 
           {/* Search Bar */}
           <div className="relative max-w-md">
@@ -99,7 +81,7 @@ export default function Products() {
 
           {/* Category Filter */}
           <div className="flex flex-wrap gap-2">
-            {categories.map((category) => (
+            {allCategories.map((category) => (
               <Button
                 key={category}
                 variant={selectedCategory === category ? "default" : "outline"}

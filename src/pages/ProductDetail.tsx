@@ -1,7 +1,5 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { initialProducts } from "@/data/products";
-import { Product } from "@/types/product";
+import { useProducts } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -10,8 +8,6 @@ import frontFerrule from "@/assets/products/front-ferrule.jpg";
 import union from "@/assets/products/union.jpg";
 import elbow from "@/assets/products/elbow.jpg";
 import connector from "@/assets/products/connector.jpg";
-
-const STORAGE_KEY = "flowra_products";
 
 const productImages: Record<string, string> = {
   "1": frontFerrule,
@@ -34,12 +30,18 @@ const productImages: Record<string, string> = {
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { products, isLoading } = useProducts();
   
-  // Load products from localStorage or use initial data
-  const [products, setProducts] = useState<Product[]>(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : initialProducts;
-  });
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading product...</p>
+        </div>
+      </div>
+    );
+  }
   
   const product = products.find((p) => p.id === id);
 

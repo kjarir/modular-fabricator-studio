@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useProducts } from "@/hooks/useProducts";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,32 +19,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-const ADMIN_PASSWORD = "noneofyourbusiness";
 
 interface AdminPanelProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  products: Product[];
-  categories: string[];
-  onProductsChange: (products: Product[]) => void;
-  onCategoriesChange: (categories: string[]) => void;
 }
 
 export const AdminPanel = ({
   open,
   onOpenChange,
-  products,
-  categories,
-  onProductsChange,
-  onCategoriesChange,
 }: AdminPanelProps) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const { products, categories, addProduct, updateProduct, deleteProduct } = useProducts();
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [formData, setFormData] = useState({
@@ -55,25 +43,6 @@ export const AdminPanel = ({
   });
   const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
   const [newCategory, setNewCategory] = useState("");
-
-  const handlePasswordSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      toast.success("Access granted!");
-    } else {
-      toast.error("Invalid password!");
-      setPassword("");
-    }
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setPassword("");
-    setEditingProduct(null);
-    setIsAdding(false);
-    onOpenChange(false);
-  };
 
   const resetForm = () => {
     setFormData({
@@ -105,29 +74,16 @@ export const AdminPanel = ({
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this product?")) {
-      const updatedProducts = products.filter((p) => p.id !== id);
-      onProductsChange(updatedProducts);
-      toast.success("Product deleted successfully!");
+      deleteProduct(id);
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.category || !formData.description) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
     const categoryToUse = isAddingNewCategory ? newCategory : formData.category;
 
-    if (!categoryToUse) {
-      toast.error("Please select or add a category");
-      return;
-    }
-
-    const productData: Product = {
-      id: editingProduct ? editingProduct.id : Date.now().toString(),
+    const productData: any = {
       name: formData.name,
       category: categoryToUse,
       description: formData.description,
@@ -138,19 +94,9 @@ export const AdminPanel = ({
     };
 
     if (editingProduct) {
-      const updatedProducts = products.map((p) =>
-        p.id === editingProduct.id ? productData : p
-      );
-      onProductsChange(updatedProducts);
-      toast.success("Product updated successfully!");
+      updateProduct({ ...productData, id: editingProduct.id });
     } else {
-      onProductsChange([productData, ...products]);
-      toast.success("Product added successfully!");
-    }
-
-    // Add new category if it doesn't exist
-    if (!categories.includes(categoryToUse) && categoryToUse !== "All Products") {
-      onCategoriesChange([...categories, categoryToUse]);
+      addProduct(productData);
     }
 
     setEditingProduct(null);
@@ -163,44 +109,9 @@ export const AdminPanel = ({
   if (!open) return null;
 
   return (
-    <Dialog open={open} onOpenChange={handleLogout}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-        {!isAuthenticated ? (
-          <>
-            <DialogHeader>
-              <DialogTitle>Admin Access</DialogTitle>
-              <DialogDescription>
-                Enter the password to access the admin panel
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handlePasswordSubmit} className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter password"
-                    className="pr-10"
-                    autoFocus
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-              <Button type="submit" className="w-full">
-                Login
-              </Button>
-            </form>
-          </>
-        ) : !isAdding && !editingProduct ? (
+        {!isAdding && !editingProduct ? (
           <>
             <DialogHeader>
               <DialogTitle>Admin Panel - Product Management</DialogTitle>

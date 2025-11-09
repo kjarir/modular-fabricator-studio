@@ -163,15 +163,16 @@ export default function ProductDetail() {
         </div>
 
         {/* Related Products */}
-        <div className="animate-fade-in" style={{ animationDelay: "0.5s" }}>
-          <h2 className="text-3xl font-bold mb-8">Related Products</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products
-              .filter(
-                (p) => p.category === product.category && p.id !== product.id
-              )
-              .slice(0, 4)
-              .map((relatedProduct, index) => (
+        {products.filter((p) => p.category === product.category && p.id !== product.id).length > 0 && (
+          <div className="animate-fade-in" style={{ animationDelay: "0.5s" }}>
+            <h2 className="text-3xl font-bold mb-8">Related Products</h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {products
+                .filter(
+                  (p) => p.category === product.category && p.id !== product.id
+                )
+                .slice(0, 4)
+                .map((relatedProduct, index) => (
                 <Link
                   key={relatedProduct.id}
                   to={`/products/${relatedProduct.id}`}
@@ -201,8 +202,9 @@ export default function ProductDetail() {
                   </Card>
                 </Link>
               ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

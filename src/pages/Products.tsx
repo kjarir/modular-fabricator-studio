@@ -1,20 +1,31 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { AdminPanel } from "@/components/AdminPanel";
 import { useProducts } from "@/hooks/useProducts";
-import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Settings } from "lucide-react";
+import { Search } from "lucide-react";
 
 export default function Products() {
   const { products, categories, isLoading } = useProducts();
-  const { isAdmin } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState("All Products");
   const [searchQuery, setSearchQuery] = useState("");
   const [isAdminOpen, setIsAdminOpen] = useState(false);
 
   const allCategories = ["All Products", ...categories];
+
+  // Hidden keyboard shortcut: Ctrl+Shift+A to open admin panel
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+        e.preventDefault();
+        setIsAdminOpen(true);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -51,21 +62,13 @@ export default function Products() {
                 Browse our complete range of instrument fittings
               </p>
             </div>
-            {isAdmin && (
-              <Button onClick={() => setIsAdminOpen(true)}>
-                <Settings className="h-4 w-4 mr-2" />
-                Admin Panel
-              </Button>
-            )}
           </div>
           
-          {/* Admin Panel */}
-          {isAdmin && (
-            <AdminPanel 
-              open={isAdminOpen} 
-              onOpenChange={setIsAdminOpen}
-            />
-          )}
+          {/* Hidden Admin Panel - accessible via Ctrl+Shift+A */}
+          <AdminPanel 
+            open={isAdminOpen} 
+            onOpenChange={setIsAdminOpen}
+          />
 
           {/* Search Bar */}
           <div className="relative max-w-md">

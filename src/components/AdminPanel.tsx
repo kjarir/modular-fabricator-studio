@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useProducts } from "@/hooks/useProducts";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
@@ -22,8 +22,7 @@ import {
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-const ADMIN_PASSWORD = "noneofyourbusiness";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AdminPanelProps {
   open: boolean;
@@ -62,18 +61,59 @@ export const AdminPanel = ({
   const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
   const [newCategory, setNewCategory] = useState("");
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      toast.success("Access granted!");
-    } else {
-      toast.error("Invalid password!");
-      setPassword("");
+    setIsAuthenticating(true);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // If already signed in, just verify and set authenticated
+      if (session) {
+        setIsAuthenticated(true);
+        toast.success("Access granted!");
+        setIsAuthenticating(false);
+        return;
+      }
+
+      // Call the Edge Function for secure authentication
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-auth`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ password }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        toast.error("Invalid password");
+        setPassword("");
+        setIsAuthenticating(false);
+        return;
+      }
+
+      // Set the session from the Edge Function response
+      if (result.session) {
+        await supabase.auth.setSession(result.session);
+        setIsAuthenticated(true);
+        toast.success("Access granted!");
+      }
+    } catch (error) {
+      console.error('Authentication error:', error);
+      toast.error("Authentication failed. Please try again.");
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     setIsAuthenticated(false);
     setPassword("");
     setEditingProduct(null);
@@ -178,8 +218,8 @@ export const AdminPanel = ({
                   </button>
                 </div>
               </div>
-              <Button type="submit" className="w-full">
-                Login
+              <Button type="submit" className="w-full" disabled={isAuthenticating}>
+                {isAuthenticating ? "Authenticating..." : "Access Admin Panel"}
               </Button>
             </form>
           </>
